@@ -1,5 +1,3 @@
-# Không đẩy file cấu hình thật lên Git (mỗi máy/môi trường tự điền riêng)
-js/config.js
 
 # File hệ thống
 .DS_Store
