@@ -1,0 +1,9 @@
+# Không đẩy file cấu hình thật lên Git (mỗi máy/môi trường tự điền riêng)
+js/config.js
+
+# File hệ thống
+.DS_Store
+Thumbs.db
+
+# Node (nếu sau này có dùng npm/serve)
+node_modules/

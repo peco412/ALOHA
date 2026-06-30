@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aloha ERP — Đăng nhập</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="login-page">
+  <div class="login-side">
+    <div class="login-brand">ALOHA <span>ERP</span></div>
+    <div>
+      <div class="login-quote">"Một hệ thống, sáu trung tâm,<br/>một quy trình minh bạch."</div>
+      <div class="login-quote-sub">Quản lý vận hành, nhân sự, kế toán và marketing<br/>cho toàn bộ hệ thống trung tâm Aloha.</div>
+      <div class="login-flow mt-md">
+        <span class="step">Nhân viên</span><span class="arrow">→</span>
+        <span class="step">Duyệt cấp 1</span><span class="arrow">→</span>
+        <span class="step">Duyệt cấp 2</span><span class="arrow">→</span>
+        <span class="step">Hoàn thành</span>
+      </div>
+    </div>
+    <div style="font-size:12px; opacity:0.6;">Mỏ Cày · Trà Vinh · Cầu Ngang · Càng Long · Duyên Hải · MEKONG</div>
+  </div>
+
+  <div class="login-main">
+    <div class="login-card">
+      <h1>Đăng nhập</h1>
+      <div class="sub">Đăng nhập bằng tài khoản nội bộ được cấp.</div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">Tên đăng nhập</label>
+          <input type="text" id="username" autocomplete="username" placeholder="vd: admin" required />
+        </div>
+        <div class="field">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" autocomplete="current-password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+      </form>
+
+      <div class="demo-accounts">
+        <div class="label">TÀI KHOẢN DEMO (mật khẩu: 123456) — bấm để điền nhanh</div>
+        <div class="demo-chip-row">
+          <button class="demo-chip" data-u="admin">Admin</button>
+          <button class="demo-chip" data-u="tgd">Ban Điều hành</button>
+          <button class="demo-chip" data-u="hr.truong">Trưởng phòng NS</button>
+          <button class="demo-chip" data-u="acc.truong">Trưởng phòng KT</button>
+          <button class="demo-chip" data-u="mkt.truong">Trưởng phòng Mkt</button>
+          <button class="demo-chip" data-u="qltt.travinh">QL Trung tâm Trà Vinh</button>
+          <button class="demo-chip" data-u="qltt.mocay">QL Trung tâm Mỏ Cày</button>
+          <button class="demo-chip" data-u="gv.thuy">Giáo viên</button>
+          <button class="demo-chip" data-u="nv.ketoan">Nhân viên Kế toán</button>
+          <button class="demo-chip" data-u="nv.marketing">Nhân viên Marketing</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/data/permissions.js"></script>
+<script src="js/seed.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Khởi tạo dữ liệu mẫu nếu chưa có
+  seedIfNeeded();
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+
+  document.querySelectorAll('.demo-chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      document.getElementById('username').value = chip.dataset.u;
+      document.getElementById('password').value = '123456';
+    });
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.classList.remove('show');
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Đang kiểm tra...';
+
+    const result = await Auth.login(username, password);
+
+    if (result.ok) {
+      // Lưu username vào URL param để dashboard.html biết ai vừa đăng nhập
+      // (vì session là biến JS, mất khi chuyển trang — đây là cách đơn giản nhất
+      // không cần localStorage; bản thật sẽ dùng cookie/JWT)
+      window.location.href = 'dashboard.html';
+    } else {
+      errorBox.textContent = result.error;
+      errorBox.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Đăng nhập';
+    }
+  });
+</script>
+</body>
+</html>
