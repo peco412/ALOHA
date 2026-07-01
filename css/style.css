@@ -4,20 +4,22 @@
 
 :root {
   /* Màu */
-  --color-bg: #F7F8FA;
-  --color-surface: #FFFFFF;
-  --color-border: #E3E7E4;
-  --color-primary: #1B4D3E;       /* xanh rêu đậm - thương hiệu */
-  --color-primary-light: #DCEAE4;
-  --color-secondary: #2E7D5B;     /* xanh lá - đã duyệt / thành công */
-  --color-secondary-light: #E1F2EA;
-  --color-warning: #D4A14A;       /* vàng đồng - chờ duyệt */
-  --color-warning-light: #FBF0DE;
-  --color-danger: #C0392B;        /* đỏ gạch - từ chối */
-  --color-danger-light: #FBE6E3;
-  --color-text: #1A1F1C;
-  --color-text-muted: #5C6661;
-  --color-text-faint: #8B9590;
+  --color-bg: #F5F8FC;
+--color-surface: #FFFFFF;
+--color-border: #DCE5F0;
+--color-primary: #0A5EB0; /* Xanh ALOHA */
+--color-primary-light: #DCEBFF;
+--color-secondary: #F59E0B; /* Cam/Vàng ALOHA */
+--color-secondary-light: #FFF3D6;
+--color-success: #16A34A; /* Thành công */
+--color-success-light: #DCFCE7;
+--color-warning: #EA580C; /* Chờ duyệt */
+--color-warning-light: #FFEDD5;
+--color-danger: #DC2626; /* Từ chối */
+--color-danger-light: #FEE2E2;
+--color-text: #102A43;
+--color-text-muted: #486581;
+--color-text-faint: #829AB1;
 
   /* Type */
   --font-display: 'Lexend', sans-serif;
