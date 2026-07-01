@@ -49,16 +49,24 @@ const DB = (() => {
   // ─── Map key-prefix → tên bảng Supabase ──────────────────────────────────
   // Giữ nguyên quy ước key cũ để module không phải sửa
   const TABLE_MAP = {
-    'users:':         'users',
-    'classes:':       'classes',
-    'students:':      'students',
-    'proposals:':     'proposals',
-    'hr_forms:':      'hr_forms',
-    'mkt_requests:':  'mkt_requests',
-    'acc_forms:':     'acc_forms',
-    'notifications:': 'notifications',
-    'schedule:':      'weekly_schedule',
-    'meta:centers':   '__centers__',   // special key
+    'users:':              'users',
+    'classes:':            'classes',
+    'students:':           'students',
+    'proposals:':          'proposals',
+    'hr_forms:':           'hr_forms',
+    'mkt_requests:':       'mkt_requests',
+    'acc_forms:':          'acc_forms',
+    'notifications:':      'notifications',
+    'schedule:':           'weekly_schedule',
+    'form_templates:':     'form_templates',
+    'form_submissions:':   'form_submissions',
+    'vendor_invoices:':    'vendor_invoices',
+    'company_seals:':      'company_seals',
+    'attendance_sessions:':'attendance_sessions',
+    'attendance_records:': 'attendance_records',
+    'work_schedules:':     'work_schedules',
+    'meetings:':           'meetings',
+    'meta:centers':        '__centers__',
   };
 
   function _resolveTable(key) {

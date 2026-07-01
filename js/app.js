@@ -11,13 +11,17 @@ const App = (() => {
 
   const MODULE_RENDERERS = {
     [MODULES.NOTIFICATIONS]: (root) => NotificationsModule.render(root),
-    [MODULES.PROFILE]: (root) => ProfileModule.render(root),
-    [MODULES.TEACHER]: (root) => TeacherModule.render(root),
-    [MODULES.CENTER]: (root) => CenterModule.render(root),
-    [MODULES.MARKETING]: (root) => MarketingModule.render(root),
-    [MODULES.ACCOUNTING]: (root) => AccountingModule.render(root),
-    [MODULES.HR]: (root) => HRModule.render(root),
-    [MODULES.OPERATIONS]: (root) => OperationsModule.render(root),
+    [MODULES.PROFILE]:       (root) => ProfileModule.render(root),
+    [MODULES.TEACHER]:       (root) => TeacherModule.render(root),
+    [MODULES.CENTER]:        (root) => CenterModule.render(root),
+    [MODULES.MARKETING]:     (root) => MarketingModule.render(root),
+    [MODULES.ACCOUNTING]:    (root) => AccountingModule.render(root),
+    [MODULES.HR]:            (root) => HRModule.render(root),
+    [MODULES.OPERATIONS]:    (root) => OperationsModule.render(root),
+    [MODULES.FORMS]:         (root) => FormsModule.render(root),
+    [MODULES.ATTENDANCE]:    (root) => AttendanceModule.render(root),
+    [MODULES.WORKSCHEDULE]:  (root) => WorkScheduleModule.render(root),
+    [MODULES.MEETINGS]:      (root) => MeetingsModule.render(root),
   };
 
   async function init() {
@@ -46,6 +50,9 @@ const App = (() => {
     const hashModule = window.location.hash.replace('#', '');
     const startModule = allowedModules.includes(hashModule) ? hashModule : allowedModules[0];
     navigateTo(startModule);
+
+    // Kiểm tra sinh nhật hôm nay sau khi app đã load xong
+    setTimeout(() => Birthday.checkAndShow(), 2000);
   }
 
   function renderSidebar(user) {

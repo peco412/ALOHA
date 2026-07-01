@@ -117,8 +117,25 @@ const HRModule = (() => {
     const centerName = u.center ? (centers.find((c) => c.id === u.center)?.name || u.center) : '—';
     const st = u.employmentStatus || 'active';
     const rowDim = st !== 'active' ? 'opacity:0.6;' : '';
+    const avatarHtml = u.avatarUrl
+      ? `<img src="${u.avatarUrl}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;" />`
+      : `<div class="sidebar-avatar" style="background:var(--color-primary-light);color:var(--color-primary);width:30px;height:30px;font-size:11px;flex-shrink:0;">${UI.userInitials(u.name)}</div>`;
+    const nameCell = `<div class="flex-row gap-sm" style="align-items:center;">${avatarHtml}<strong>${UI.escapeHtml(u.name)}</strong></div>`;
+
+    // Người không phải HR/BGD/Admin chỉ thấy thông tin cơ bản
+    if (!isHRManager) {
+      return `<tr style="${rowDim}">
+        <td>${nameCell}</td>
+        <td>${UI.escapeHtml(u.dept || '—')}</td>
+        <td>${UI.escapeHtml(centerName)}</td>
+        <td>${UI.escapeHtml(u.phone || '—')}</td>
+        <td>${UI.escapeHtml(u.email || '—')}</td>
+        <td></td><td></td>
+      </tr>`;
+    }
+
     return `<tr style="${rowDim}">
-      <td><strong>${UI.escapeHtml(u.name)}</strong></td>
+      <td>${nameCell}</td>
       <td>${UI.escapeHtml(u.position || '—')}</td>
       <td>${UI.escapeHtml(u.dept || '—')}</td>
       <td>${UI.escapeHtml(centerName)}</td>
@@ -126,7 +143,7 @@ const HRModule = (() => {
       <td>${employmentStatusBadge(st)}</td>
       <td>
         <button class="btn btn-secondary btn-sm btnViewProfile" data-id="${u.id}">Xem hồ sơ</button>
-        ${isHRManager ? `<button class="btn btn-secondary btn-sm btnStaffStatus" data-id="${u.id}" style="margin-left:4px;">Trạng thái</button>` : ''}
+        <button class="btn btn-secondary btn-sm btnStaffStatus" data-id="${u.id}" style="margin-left:4px;">Trạng thái</button>
       </td>
     </tr>`;
   }

@@ -54,24 +54,82 @@ const AccountingModule = (() => {
     root.querySelector('#btnNewAccForm').addEventListener('click', () => openNewFormModal(user));
     if (isAccManager) {
       root.querySelectorAll('[data-act]').forEach((btn) => btn.addEventListener('click', () => handleAction(btn.dataset.id, btn.dataset.act)));
+      root.querySelectorAll('.btnSignAcc').forEach((btn) => btn.addEventListener('click', () => handleSign(btn.dataset.id, user)));
     }
   }
 
   function formRow(f, users, isAccManager) {
     const requester = users.find((u) => u.id === f.requestedBy);
+    const sigCount = (f.signatures || []).length;
     return `<tr>
       <td class="mono" style="font-size:12px;">${f.id}</td>
       <td>${f.type === 'payment' ? 'Đơn thanh toán' : 'Đơn tạm ứng'}</td>
       <td>${UI.escapeHtml(f.title)}</td>
       <td><strong>${UI.formatMoney(f.amount)}</strong></td>
       <td>${requester?.name || f.requestedBy}</td>
-      <td>${f.attachmentUrl ? `<a href="${f.attachmentUrl}" target="_blank">📎 Xem</a>` : '—'}</td>
+      <td>
+        ${f.attachmentUrl ? `<a href="${f.attachmentUrl}" target="_blank">📎 ${sigCount > 0 ? `Đã ký (${sigCount})` : 'Xem'}</a>` : '—'}
+      </td>
       <td>${UI.statusBadge(f.status)}</td>
-      ${isAccManager ? `<td>${f.status === 'pending' ? `
-        <button class="btn btn-danger btn-sm" data-act="reject" data-id="${f.id}">Từ chối</button>
-        <button class="btn btn-primary btn-sm" data-act="approve" data-id="${f.id}">Duyệt</button>
-      ` : ''}</td>` : ''}
+      ${isAccManager ? `<td>
+        ${f.status === 'pending' ? `
+          <button class="btn btn-secondary btn-sm btnSignAcc" data-id="${f.id}" style="margin-bottom:3px;">✍️ Ký</button><br/>
+          <button class="btn btn-danger btn-sm" data-act="reject" data-id="${f.id}">Từ chối</button>
+          <button class="btn btn-primary btn-sm" data-act="approve" data-id="${f.id}">Duyệt</button>
+        ` : f.attachmentUrl ? `<a href="${f.attachmentUrl}" target="_blank" class="btn btn-secondary btn-sm">📎 Xem</a>` : ''}
+      </td>` : ''}
     </tr>`;
+  }
+
+  async function handleSign(id, user) {
+    const f = await DB.get(`acc_forms:${id}`);
+    if (!f) return;
+    if (!f.attachmentUrl) { UI.toast('Đơn này chưa có file PDF để ký.', 'error'); return; }
+
+    const fullUser = await DB.get(`users:${user.id}`);
+    if (!fullUser?.signatureUrl) {
+      UI.toast('Bạn chưa upload chữ ký. Vào "Hồ sơ cá nhân" → "Chữ ký số" để upload trước.', 'error');
+      return;
+    }
+
+    const isBGD = user.role === ROLES.EXEC || user.role === ROLES.ADMIN;
+    UI.openModal('Xác nhận ký vào đơn', `
+      <div class="mb-md">Bạn sắp ký chữ ký số vào đơn: <strong>${UI.escapeHtml(f.title)}</strong></div>
+      <div class="flex-row gap-sm mb-md">
+        <img src="${fullUser.signatureUrl}" style="height:50px;object-fit:contain;border:1px solid var(--color-border);border-radius:6px;padding:4px;background:#fff;" />
+        <span class="text-faint" style="font-size:12.5px;">Chữ ký của bạn sẽ được chèn vào góc dưới phải file PDF.</span>
+      </div>
+      ${isBGD ? '<div class="text-faint" style="font-size:12.5px;">Với tư cách BGD, mộc công ty sẽ được chèn thêm vào góc dưới trái.</div>' : ''}
+      <div class="field"><label>Ghi chú (tùy chọn)</label><input type="text" id="accSignNote" placeholder="VD: Đã xem xét và chấp thuận" /></div>
+    `, `
+      <button class="btn btn-secondary" id="cancelSign">Hủy</button>
+      <button class="btn btn-primary" id="confirmSign">✍️ Ký vào file</button>
+    `);
+
+    document.getElementById('cancelSign').addEventListener('click', UI.closeModal);
+    document.getElementById('confirmSign').addEventListener('click', async () => {
+      const btn = document.getElementById('confirmSign');
+      btn.disabled = true; btn.textContent = 'Đang xử lý...';
+      try {
+        let signedUrl = await PdfSign.signAndUpload(f.attachmentUrl, fullUser.signatureUrl, 'signed/acc_forms');
+        if (isBGD) {
+          const seals = await DB.getTable('company_seals:');
+          const seal = seals.find((s) => s.isActive);
+          if (seal) signedUrl = await PdfSign.signAndUpload(signedUrl, seal.sealUrl, 'signed/acc_forms', { x: 60, y: 80, width: 80, height: 80 });
+        }
+        const note = document.getElementById('accSignNote').value.trim();
+        f.attachmentUrl = signedUrl;
+        f.signatures = [...(f.signatures || []), { by: user.id, role: user.role, signedAt: new Date().toISOString(), note }];
+        const ok = await DB.set(`acc_forms:${f.id}`, f);
+        if (!ok) { UI.toast('Lỗi lưu chữ ký.', 'error'); return; }
+        UI.closeModal();
+        UI.toast('Đã ký vào file thành công.', 'success');
+        App.refreshCurrent();
+      } catch (e) {
+        UI.toast('Lỗi ký file: ' + e.message, 'error');
+        btn.disabled = false; btn.textContent = '✍️ Ký vào file';
+      }
+    });
   }
 
   async function handleAction(id, act) {

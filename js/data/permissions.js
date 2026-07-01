@@ -37,17 +37,25 @@ const MODULES = {
   ACCOUNTING:    'accounting',
   HR:            'hr',
   OPERATIONS:    'operations',
+  FORMS:         'forms',        // Biểu mẫu động (CSVC, sự kiện, hóa đơn)
+  ATTENDANCE:    'attendance',   // Điểm danh lớp học
+  WORKSCHEDULE:  'workschedule', // Lịch làm việc nhân sự
+  MEETINGS:      'meetings',     // Lịch họp
 };
 
 const MODULE_META = {
-  [MODULES.NOTIFICATIONS]: { label: 'Thông báo',            icon: '🔔' },
-  [MODULES.PROFILE]:       { label: 'Hồ sơ cá nhân',        icon: '👤' },
-  [MODULES.TEACHER]:       { label: 'Giáo viên',             icon: '📚' },
-  [MODULES.CENTER]:        { label: 'Quản lý Trung tâm',     icon: '🏢' },
-  [MODULES.MARKETING]:     { label: 'Marketing',             icon: '📣' },
-  [MODULES.ACCOUNTING]:    { label: 'Kế toán',               icon: '💰' },
-  [MODULES.HR]:            { label: 'Nhân sự',               icon: '🧑‍💼' },
-  [MODULES.OPERATIONS]:    { label: 'Trung tâm Điều hành',   icon: '🛡️' },
+  [MODULES.NOTIFICATIONS]: { label: 'Thông báo',              icon: '🔔' },
+  [MODULES.PROFILE]:       { label: 'Hồ sơ cá nhân',          icon: '👤' },
+  [MODULES.TEACHER]:       { label: 'Giáo viên',               icon: '📚' },
+  [MODULES.CENTER]:        { label: 'Quản lý Trung tâm',       icon: '🏢' },
+  [MODULES.MARKETING]:     { label: 'Marketing',               icon: '📣' },
+  [MODULES.ACCOUNTING]:    { label: 'Kế toán',                 icon: '💰' },
+  [MODULES.HR]:            { label: 'Nhân sự',                 icon: '🧑‍💼' },
+  [MODULES.OPERATIONS]:    { label: 'Trung tâm Điều hành',     icon: '🛡️' },
+  [MODULES.FORMS]:         { label: 'Biểu mẫu',               icon: '📋' },
+  [MODULES.ATTENDANCE]:    { label: 'Điểm danh',               icon: '✅' },
+  [MODULES.WORKSCHEDULE]:  { label: 'Lịch làm việc',           icon: '📅' },
+  [MODULES.MEETINGS]:      { label: 'Lịch họp',                icon: '🤝' },
 };
 
 /**
@@ -61,30 +69,32 @@ const ROLE_MODULES = {
   [ROLES.EXEC]: [
     MODULES.NOTIFICATIONS, MODULES.PROFILE,
     MODULES.CENTER, MODULES.MARKETING, MODULES.ACCOUNTING, MODULES.HR,
-    MODULES.OPERATIONS,
+    MODULES.OPERATIONS, MODULES.FORMS, MODULES.ATTENDANCE,
+    MODULES.WORKSCHEDULE, MODULES.MEETINGS,
   ],
 
-  // Trưởng phòng Nhân sự thấy cả Center để nhập nhân viên mới
   [ROLES.DEPT_HEAD]: [
     MODULES.NOTIFICATIONS, MODULES.PROFILE,
     MODULES.CENTER, MODULES.MARKETING, MODULES.ACCOUNTING, MODULES.HR,
+    MODULES.FORMS, MODULES.WORKSCHEDULE, MODULES.MEETINGS,
   ],
 
-  // Quản lý trung tâm thấy Center (phân lịch, lớp, học viên) + các phòng ban để gửi yêu cầu
   [ROLES.CENTER_MANAGER]: [
     MODULES.NOTIFICATIONS, MODULES.PROFILE,
     MODULES.CENTER, MODULES.MARKETING, MODULES.ACCOUNTING, MODULES.HR,
+    MODULES.FORMS, MODULES.ATTENDANCE, MODULES.WORKSCHEDULE, MODULES.MEETINGS,
   ],
 
-  // Giáo viên & staff đều thấy tất cả module để tạo yêu cầu + theo dõi
   [ROLES.TEACHER]: [
     MODULES.NOTIFICATIONS, MODULES.PROFILE, MODULES.TEACHER,
     MODULES.CENTER, MODULES.MARKETING, MODULES.ACCOUNTING, MODULES.HR,
+    MODULES.FORMS, MODULES.ATTENDANCE, MODULES.MEETINGS,
   ],
 
   [ROLES.STAFF]: [
     MODULES.NOTIFICATIONS, MODULES.PROFILE,
     MODULES.CENTER, MODULES.MARKETING, MODULES.ACCOUNTING, MODULES.HR,
+    MODULES.FORMS, MODULES.MEETINGS,
   ],
 };
 
