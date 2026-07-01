@@ -103,24 +103,63 @@ const DB = (() => {
   }
 
   /** Ghi 1 record (upsert). */
-  async function set(key, value) {
-    try {
-      const info = _resolveTable(key);
-      if (!info || info.special) return false;
+/** Ghi 1 record (insert/update an toàn). */
+async function set(key, value) {
+  try {
+    const info = _resolveTable(key);
+    if (!info || info.special) return false;
 
-      // Đảm bảo id được set đúng
-      const row = _toRow({ ...value, id: info.id });
-      const { error } = await _table(info.table).upsert(row, { onConflict: 'id' });
-      if (error) {
-        console.error('DB.set error (Supabase):', key, '→ table:', info.table, '→', error.message, error);
-        return false;
-      }
-      return true;
-    } catch (e) {
-      console.error('DB.set error (exception):', key, e);
+    const row = _toRow({ ...value, id: info.id });
+
+    // Kiểm tra record đã tồn tại chưa
+    const { data: existing, error: findError } = await _table(info.table)
+      .select("id")
+      .eq("id", row.id)
+      .maybeSingle();
+
+    if (findError) {
+      console.error("DB.find error:", findError);
       return false;
     }
+
+    let result;
+
+    if (existing) {
+      // Không cho update password nếu form không có trường password
+      delete row.password_hash;
+
+      result = await _table(info.table)
+        .update(row)
+        .eq("id", row.id);
+    } else {
+      // Insert mới thì phải có password_hash
+      if (info.table === "users" && !row.password_hash) {
+        console.error("Không thể tạo user mới vì thiếu password_hash");
+        return false;
+      }
+
+      result = await _table(info.table).insert(row);
+    }
+
+    if (result.error) {
+      console.error(
+        "DB.set error (Supabase):",
+        key,
+        "→ table:",
+        info.table,
+        "→",
+        result.error.message,
+        result.error
+      );
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    console.error("DB.set exception:", e);
+    return false;
   }
+}
 
   /** Xóa 1 record. */
   async function remove(key) {
